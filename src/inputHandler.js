@@ -1,5 +1,6 @@
 const readline = require("readline");
 const calculator = require("./calculator");
+const validator = require("./validator");
 
 /**
  * Parse and validate calculator input
@@ -7,6 +8,12 @@ const calculator = require("./calculator");
  * @returns {object} Result with success flag and message or result
  */
 const parseInput = (input) => {
+  // Validate input format
+  const formatValidation = validator.validateInputFormat(input);
+  if (!formatValidation.valid) {
+    return { success: false, message: formatValidation.error };
+  }
+
   const parts = input.trim().split(/\s+/);
 
   if (parts.length === 0 || parts[0].toLowerCase() === "exit") {
@@ -18,65 +25,29 @@ const parseInput = (input) => {
   }
 
   const operation = parts[0].toLowerCase();
-  const num1 = parseFloat(parts[1]);
-  const num2 = parseFloat(parts[2]);
 
-  // Single operand operations
-  if (["square", "sqrt", "squareroot"].includes(operation)) {
-    if (parts.length !== 2) {
-      return {
-        success: false,
-        message: `Operation '${operation}' requires exactly 1 number`,
-      };
-    }
-    if (isNaN(num1)) {
-      return { success: false, message: "Invalid number provided" };
-    }
-
-    try {
-      let result;
-      if (operation === "square") {
-        result = calculator.square(num1);
-      } else if (["sqrt", "squareroot"].includes(operation)) {
-        result = calculator.squareRoot(num1);
-      }
-      return {
-        success: true,
-        result,
-        operation: operation === "sqrt" ? "squareroot" : operation,
-        operands: [num1],
-      };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
+  // Validate operation exists
+  const opValidation = validator.validateOperation(operation);
+  if (!opValidation.valid) {
+    return { success: false, message: opValidation.error };
   }
 
-  // Two operand operations
-  const binaryOps = [
-    "add",
-    "+",
-    "subtract",
-    "-",
-    "multiply",
-    "*",
-    "divide",
-    "/",
-    "power",
-    "^",
-  ];
-  if (!binaryOps.includes(operation)) {
-    return { success: false, message: `Unknown operation: '${operation}'` };
+  // Parse operands
+  const operands = parts.slice(1).map((p) => parseFloat(p));
+
+  // Validate operand count
+  const countValidation = validator.validateOperandCount(
+    operation,
+    operands.length,
+  );
+  if (!countValidation.valid) {
+    return { success: false, message: countValidation.error };
   }
 
-  if (parts.length !== 3) {
-    return {
-      success: false,
-      message: `Operation '${operation}' requires exactly 2 numbers`,
-    };
-  }
-
-  if (isNaN(num1) || isNaN(num2)) {
-    return { success: false, message: "Invalid numbers provided" };
+  // Validate operands
+  const operandValidation = validator.validateOperands(operation, operands);
+  if (!operandValidation.valid) {
+    return { success: false, message: operandValidation.error };
   }
 
   try {
@@ -86,34 +57,49 @@ const parseInput = (input) => {
     switch (operation) {
       case "+":
       case "add":
-        result = calculator.add(num1, num2);
+        result = calculator.add(operands[0], operands[1]);
         op = "add";
         break;
       case "-":
       case "subtract":
-        result = calculator.subtract(num1, num2);
+        result = calculator.subtract(operands[0], operands[1]);
         op = "subtract";
         break;
       case "*":
       case "multiply":
-        result = calculator.multiply(num1, num2);
+        result = calculator.multiply(operands[0], operands[1]);
         op = "multiply";
         break;
       case "/":
       case "divide":
-        result = calculator.divide(num1, num2);
+        result = calculator.divide(operands[0], operands[1]);
         op = "divide";
         break;
       case "^":
       case "power":
-        result = calculator.power(num1, num2);
+        result = calculator.power(operands[0], operands[1]);
         op = "power";
+        break;
+      case "square":
+        result = calculator.square(operands[0]);
+        op = "square";
+        break;
+      case "sqrt":
+      case "squareroot":
+        result = calculator.squareRoot(operands[0]);
+        op = "squareroot";
         break;
       default:
         return { success: false, message: `Unknown operation: '${operation}'` };
     }
 
-    return { success: true, result, operation: op, operands: [num1, num2] };
+    // Validate result
+    const resultValidation = validator.validateResult(result);
+    if (!resultValidation.valid) {
+      return { success: false, message: resultValidation.error };
+    }
+
+    return { success: true, result, operation: op, operands };
   } catch (error) {
     return { success: false, message: error.message };
   }
@@ -164,7 +150,7 @@ const startInteractive = () => {
 
   console.log(`
 ╔════════════════════════════════════════════════════════╗
-║           Welcome to Calculator v1.0                    ║
+║           Welcome to Calculator v1.0                   ║
 ║     Type 'help' for commands or 'exit' to quit         ║
 ╚════════════════════════════════════════════════════════╝
   `);

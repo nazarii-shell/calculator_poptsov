@@ -100,25 +100,25 @@ describe("Input Handler - Input Parsing", () => {
     test("should handle unknown operation", () => {
       const result = parseInput("unknown 5 3");
       expect(result.success).toBe(false);
-      expect(result.message).toContain("Unknown operation");
+      expect(result.message).toContain("not recognized");
     });
 
     test("should handle missing operands for binary operation", () => {
       const result = parseInput("add 5");
       expect(result.success).toBe(false);
-      expect(result.message).toContain("requires exactly 2 numbers");
+      expect(result.message).toContain("requires exactly 2 operands");
     });
 
     test("should handle missing operand for unary operation", () => {
       const result = parseInput("square");
       expect(result.success).toBe(false);
-      expect(result.message).toContain("requires exactly 1 number");
+      expect(result.message).toContain("requires exactly 1 operand");
     });
 
     test("should handle non-numeric input", () => {
       const result = parseInput("add abc def");
       expect(result.success).toBe(false);
-      expect(result.message).toContain("Invalid numbers");
+      expect(result.message).toContain("valid number");
     });
 
     test("should handle division by zero error", () => {
