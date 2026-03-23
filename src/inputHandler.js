@@ -1,6 +1,16 @@
 const readline = require("readline");
-const calculator = require("./calculator");
 const validator = require("./validator");
+const registry = require("./operationRegistry");
+
+/**
+ * Normalize operation name to primary operation name
+ * @param {string} operationName - Operation name or alias
+ * @returns {string|null} Primary operation name or null
+ */
+const normalizeOperationName = (operationName) => {
+  const operation = registry.getOperation(operationName);
+  return operation ? operation.name : null;
+};
 
 /**
  * Parse and validate calculator input
@@ -24,10 +34,10 @@ const parseInput = (input) => {
     return { success: true, help: true };
   }
 
-  const operation = parts[0].toLowerCase();
+  const operationInput = parts[0].toLowerCase();
 
   // Validate operation exists
-  const opValidation = validator.validateOperation(operation);
+  const opValidation = validator.validateOperation(operationInput);
   if (!opValidation.valid) {
     return { success: false, message: opValidation.error };
   }
@@ -37,7 +47,7 @@ const parseInput = (input) => {
 
   // Validate operand count
   const countValidation = validator.validateOperandCount(
-    operation,
+    operationInput,
     operands.length,
   );
   if (!countValidation.valid) {
@@ -45,53 +55,17 @@ const parseInput = (input) => {
   }
 
   // Validate operands
-  const operandValidation = validator.validateOperands(operation, operands);
+  const operandValidation = validator.validateOperands(
+    operationInput,
+    operands,
+  );
   if (!operandValidation.valid) {
     return { success: false, message: operandValidation.error };
   }
 
   try {
-    let result;
-    let op = operation;
-
-    switch (operation) {
-      case "+":
-      case "add":
-        result = calculator.add(operands[0], operands[1]);
-        op = "add";
-        break;
-      case "-":
-      case "subtract":
-        result = calculator.subtract(operands[0], operands[1]);
-        op = "subtract";
-        break;
-      case "*":
-      case "multiply":
-        result = calculator.multiply(operands[0], operands[1]);
-        op = "multiply";
-        break;
-      case "/":
-      case "divide":
-        result = calculator.divide(operands[0], operands[1]);
-        op = "divide";
-        break;
-      case "^":
-      case "power":
-        result = calculator.power(operands[0], operands[1]);
-        op = "power";
-        break;
-      case "square":
-        result = calculator.square(operands[0]);
-        op = "square";
-        break;
-      case "sqrt":
-      case "squareroot":
-        result = calculator.squareRoot(operands[0]);
-        op = "squareroot";
-        break;
-      default:
-        return { success: false, message: `Unknown operation: '${operation}'` };
-    }
+    // Execute operation using registry
+    const result = registry.execute(operationInput, ...operands);
 
     // Validate result
     const resultValidation = validator.validateResult(result);
@@ -99,32 +73,46 @@ const parseInput = (input) => {
       return { success: false, message: resultValidation.error };
     }
 
-    return { success: true, result, operation: op, operands };
+    // Get primary operation name for consistent output
+    const operationName = normalizeOperationName(operationInput);
+
+    return { success: true, result, operation: operationName, operands };
   } catch (error) {
     return { success: false, message: error.message };
   }
 };
 
 /**
- * Display help message
+ * Display help message with dynamically generated operation list
  */
 const showHelp = () => {
+  const ops = registry.getAllOperations();
+
+  // Separate unary and binary operations
+  const unaryOps = Object.values(ops).filter((op) => op.arity === 1);
+  const binaryOps = Object.values(ops).filter((op) => op.arity === 2);
+
+  // Format operation display with aliases
+  const formatOp = (op) => {
+    const aliases = op.aliases.length > 0 ? `, ${op.aliases.join(", ")}` : "";
+    return `  ${op.name}${aliases}`.padEnd(20) + `: ${op.description}`;
+  };
+
   console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║               CALCULATOR OPERATIONS                     ║
 ╚════════════════════════════════════════════════════════╝
 
-BINARY OPERATIONS (2 numbers):
-  add, +              : num1 + num2
-  subtract, -         : num1 - num2
-  multiply, *         : num1 × num2
-  divide, /           : num1 ÷ num2
-  power, ^            : num1 ^ num2
+BINARY OPERATIONS (2 numbers):`);
 
-UNARY OPERATIONS (1 number):
-  square              : num ^ 2
-  sqrt, squareroot    : √num
+  binaryOps.forEach((op) => console.log(formatOp(op)));
 
+  console.log(`
+UNARY OPERATIONS (1 number):`);
+
+  unaryOps.forEach((op) => console.log(formatOp(op)));
+
+  console.log(`
 EXAMPLES:
   add 5 3             → 8
   divide 20 4         → 5
@@ -150,7 +138,7 @@ const startInteractive = () => {
 
   console.log(`
 ╔════════════════════════════════════════════════════════╗
-║           Welcome to Calculator v1.0                   ║
+║           Welcome to Calculator v1.0                    ║
 ║     Type 'help' for commands or 'exit' to quit         ║
 ╚════════════════════════════════════════════════════════╝
   `);
@@ -221,4 +209,5 @@ module.exports = {
   showHelp,
   startInteractive,
   handleCLIArgs,
+  normalizeOperationName,
 };

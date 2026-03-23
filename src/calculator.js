@@ -1,61 +1,63 @@
 /**
  * Calculator module with basic arithmetic operations
+ * Uses operation registry pattern for maintainability and extensibility
  */
 
-const add = (a, b) => {
-  if (typeof a !== "number" || typeof b !== "number") {
-    throw new Error("Both arguments must be numbers");
-  }
-  return a + b;
-};
+const registry = require("./operationRegistry");
 
-const subtract = (a, b) => {
-  if (typeof a !== "number" || typeof b !== "number") {
-    throw new Error("Both arguments must be numbers");
-  }
-  return a - b;
-};
+/**
+ * Add two numbers
+ * @param {number} a - First number
+ * @param {number} b - Second number
+ * @returns {number} Sum of a and b
+ */
+const add = (a, b) => registry.execute("add", a, b);
 
-const multiply = (a, b) => {
-  if (typeof a !== "number" || typeof b !== "number") {
-    throw new Error("Both arguments must be numbers");
-  }
-  return a * b;
-};
+/**
+ * Subtract two numbers
+ * @param {number} a - First number
+ * @param {number} b - Second number
+ * @returns {number} Difference of a and b
+ */
+const subtract = (a, b) => registry.execute("subtract", a, b);
 
-const divide = (a, b) => {
-  if (typeof a !== "number" || typeof b !== "number") {
-    throw new Error("Both arguments must be numbers");
-  }
-  if (b === 0) {
-    throw new Error("Division by zero is not allowed");
-  }
-  return a / b;
-};
+/**
+ * Multiply two numbers
+ * @param {number} a - First number
+ * @param {number} b - Second number
+ * @returns {number} Product of a and b
+ */
+const multiply = (a, b) => registry.execute("multiply", a, b);
 
-const power = (a, b) => {
-  if (typeof a !== "number" || typeof b !== "number") {
-    throw new Error("Both arguments must be numbers");
-  }
-  return Math.pow(a, b);
-};
+/**
+ * Divide two numbers
+ * @param {number} a - Dividend
+ * @param {number} b - Divisor
+ * @returns {number} Quotient of a and b
+ */
+const divide = (a, b) => registry.execute("divide", a, b);
 
-const square = (a) => {
-  if (typeof a !== "number") {
-    throw new Error("Argument must be a number");
-  }
-  return a * a;
-};
+/**
+ * Raise a number to a power
+ * @param {number} a - Base number
+ * @param {number} b - Exponent
+ * @returns {number} a raised to the power of b
+ */
+const power = (a, b) => registry.execute("power", a, b);
 
-const squareRoot = (a) => {
-  if (typeof a !== "number") {
-    throw new Error("Argument must be a number");
-  }
-  if (a < 0) {
-    throw new Error("Square root of negative numbers is not allowed");
-  }
-  return Math.sqrt(a);
-};
+/**
+ * Square a number
+ * @param {number} a - Input number
+ * @returns {number} Square of a
+ */
+const square = (a) => registry.execute("square", a);
+
+/**
+ * Calculate square root
+ * @param {number} a - Input number
+ * @returns {number} Square root of a
+ */
+const squareRoot = (a) => registry.execute("squareRoot", a);
 
 module.exports = {
   add,

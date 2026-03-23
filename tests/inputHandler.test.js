@@ -85,14 +85,14 @@ describe("Input Handler - Input Parsing", () => {
       const result = parseInput("sqrt 16");
       expect(result.success).toBe(true);
       expect(result.result).toBe(4);
-      expect(result.operation).toBe("squareroot");
+      expect(result.operation).toBe("squareRoot");
     });
 
     test("should parse squareroot operation", () => {
       const result = parseInput("squareroot 25");
       expect(result.success).toBe(true);
       expect(result.result).toBe(5);
-      expect(result.operation).toBe("squareroot");
+      expect(result.operation).toBe("squareRoot");
     });
   });
 
