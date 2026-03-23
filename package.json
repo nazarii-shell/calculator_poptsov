@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "A simple calculator with basic arithmetic operations",
   "main": "src/index.js",
+  "bin": {
+    "calculator": "bin/calculator"
+  },
   "scripts": {
+    "start": "node bin/calculator",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
