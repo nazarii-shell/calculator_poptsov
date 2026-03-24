@@ -30,7 +30,7 @@
  * const root = calc.squareRoot(25);   // 5
  */
 
-const registry = require("./operationRegistry");
+const registry = require('./operationRegistry');
 
 /**
  * Add two numbers together
@@ -47,7 +47,7 @@ const registry = require("./operationRegistry");
  * add(-5, 2)       // -3
  * add(0.5, 0.5)    // 1
  */
-const add = (a, b) => registry.execute("add", a, b);
+const add = (a, b) => registry.execute('add', a, b);
 
 /**
  * Subtract one number from another
@@ -64,7 +64,7 @@ const add = (a, b) => registry.execute("add", a, b);
  * subtract(5, 10)      // -5
  * subtract(-5, -3)     // -2
  */
-const subtract = (a, b) => registry.execute("subtract", a, b);
+const subtract = (a, b) => registry.execute('subtract', a, b);
 
 /**
  * Multiply two numbers
@@ -81,7 +81,7 @@ const subtract = (a, b) => registry.execute("subtract", a, b);
  * multiply(-3, 2)      // -6
  * multiply(2.5, 4)     // 10
  */
-const multiply = (a, b) => registry.execute("multiply", a, b);
+const multiply = (a, b) => registry.execute('multiply', a, b);
 
 /**
  * Divide one number by another
@@ -102,7 +102,7 @@ const multiply = (a, b) => registry.execute("multiply", a, b);
  * divide(7, 2)         // 3.5
  * divide(10, 0)        // Throws error
  */
-const divide = (a, b) => registry.execute("divide", a, b);
+const divide = (a, b) => registry.execute('divide', a, b);
 
 /**
  * Raise a number to a power
@@ -124,7 +124,7 @@ const divide = (a, b) => registry.execute("divide", a, b);
  * power(2, -2)         // 0.25
  * power(10, 2)         // 100
  */
-const power = (a, b) => registry.execute("power", a, b);
+const power = (a, b) => registry.execute('power', a, b);
 
 /**
  * Square a number (raise to power of 2)
@@ -144,7 +144,7 @@ const power = (a, b) => registry.execute("power", a, b);
  * square(0)            // 0
  * square(2.5)          // 6.25
  */
-const square = (a) => registry.execute("square", a);
+const square = (a) => registry.execute('square', a);
 
 /**
  * Calculate the square root of a number
@@ -166,7 +166,7 @@ const square = (a) => registry.execute("square", a);
  * squareRoot(100)      // 10
  * squareRoot(-9)       // Throws error
  */
-const squareRoot = (a) => registry.execute("squareRoot", a);
+const squareRoot = (a) => registry.execute('squareRoot', a);
 
 /**
  * Public API

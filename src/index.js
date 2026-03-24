@@ -1,5 +1,5 @@
-const calculator = require("./calculator");
-const inputHandler = require("./inputHandler");
+const calculator = require('./calculator');
+const inputHandler = require('./inputHandler');
 
 // If run directly from command line
 if (require.main === module) {
@@ -7,5 +7,6 @@ if (require.main === module) {
   inputHandler.handleCLIArgs(args);
 }
 
-// Exporting calculator for use in other modules (e.g., tests)
+// export for testing and potential future use in other contexts
+// This allows us to import the calculator functions and input handling logic
 module.exports = calculator;

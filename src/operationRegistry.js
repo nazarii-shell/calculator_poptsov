@@ -40,8 +40,6 @@
  * const names = registry.getOperationNames();
  */
 
-const validator = require("./validator");
-
 /**
  * Validate argument count and types for an operation
  *
@@ -71,7 +69,7 @@ const validateArgs = (args, expectedCount) => {
     );
   }
   args.forEach((arg, index) => {
-    if (typeof arg !== "number" || !isFinite(arg)) {
+    if (typeof arg !== 'number' || !isFinite(arg)) {
       throw new Error(`Argument ${index + 1} must be a valid number`);
     }
   });
@@ -102,53 +100,53 @@ const validateArgs = (args, expectedCount) => {
 const operations = {
   // Binary operations
   add: {
-    name: "add",
-    aliases: ["+"],
+    name: 'add',
+    aliases: ['+'],
     arity: 2,
-    description: "Addition",
+    description: 'Addition',
     execute: (a, b) => {
       validateArgs([a, b], 2);
       return a + b;
     },
   },
   subtract: {
-    name: "subtract",
-    aliases: ["-"],
+    name: 'subtract',
+    aliases: ['-'],
     arity: 2,
-    description: "Subtraction",
+    description: 'Subtraction',
     execute: (a, b) => {
       validateArgs([a, b], 2);
       return a - b;
     },
   },
   multiply: {
-    name: "multiply",
-    aliases: ["*"],
+    name: 'multiply',
+    aliases: ['*'],
     arity: 2,
-    description: "Multiplication",
+    description: 'Multiplication',
     execute: (a, b) => {
       validateArgs([a, b], 2);
       return a * b;
     },
   },
   divide: {
-    name: "divide",
-    aliases: ["/"],
+    name: 'divide',
+    aliases: ['/'],
     arity: 2,
-    description: "Division",
+    description: 'Division',
     execute: (a, b) => {
       validateArgs([a, b], 2);
       if (b === 0) {
-        throw new Error("Division by zero is not allowed");
+        throw new Error('Division by zero is not allowed');
       }
       return a / b;
     },
   },
   power: {
-    name: "power",
-    aliases: ["^"],
+    name: 'power',
+    aliases: ['^'],
     arity: 2,
-    description: "Exponentiation",
+    description: 'Exponentiation',
     execute: (a, b) => {
       validateArgs([a, b], 2);
       return Math.pow(a, b);
@@ -157,24 +155,24 @@ const operations = {
 
   // Unary operations
   square: {
-    name: "square",
+    name: 'square',
     aliases: [],
     arity: 1,
-    description: "Square a number",
+    description: 'Square a number',
     execute: (a) => {
       validateArgs([a], 1);
       return a * a;
     },
   },
   squareRoot: {
-    name: "squareRoot",
-    aliases: ["sqrt", "squareroot"],
+    name: 'squareRoot',
+    aliases: ['sqrt', 'squareroot'],
     arity: 1,
-    description: "Square root",
+    description: 'Square root',
     execute: (a) => {
       validateArgs([a], 1);
       if (a < 0) {
-        throw new Error("Square root of negative numbers is not allowed");
+        throw new Error('Square root of negative numbers is not allowed');
       }
       return Math.sqrt(a);
     },

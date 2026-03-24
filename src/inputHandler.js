@@ -1,6 +1,6 @@
-const readline = require("readline");
-const validator = require("./validator");
-const registry = require("./operationRegistry");
+const readline = require('readline');
+const validator = require('./validator');
+const registry = require('./operationRegistry');
 
 /**
  * Normalize operation name to primary operation name
@@ -26,11 +26,11 @@ const parseInput = (input) => {
 
   const parts = input.trim().split(/\s+/);
 
-  if (parts.length === 0 || parts[0].toLowerCase() === "exit") {
-    return { success: false, exit: true, message: "Exiting calculator..." };
+  if (parts.length === 0 || parts[0].toLowerCase() === 'exit') {
+    return { success: false, exit: true, message: 'Exiting calculator...' };
   }
 
-  if (parts[0].toLowerCase() === "help") {
+  if (parts[0].toLowerCase() === 'help') {
     return { success: true, help: true };
   }
 
@@ -94,7 +94,7 @@ const showHelp = () => {
 
   // Format operation display with aliases
   const formatOp = (op) => {
-    const aliases = op.aliases.length > 0 ? `, ${op.aliases.join(", ")}` : "";
+    const aliases = op.aliases.length > 0 ? `, ${op.aliases.join(', ')}` : '';
     return `  ${op.name}${aliases}`.padEnd(20) + `: ${op.description}`;
   };
 
@@ -144,7 +144,7 @@ const startInteractive = () => {
   `);
 
   const prompt = () => {
-    rl.question("> ", (input) => {
+    rl.question('> ', (input) => {
       const result = parseInput(input);
 
       if (result.exit) {
@@ -160,7 +160,6 @@ const startInteractive = () => {
       }
 
       if (result.success) {
-        const operands = result.operands.join(" ");
         console.log(`Result: ${result.result}`);
       } else {
         console.error(`Error: ${result.message}`);
@@ -183,7 +182,7 @@ const handleCLIArgs = (args) => {
     return;
   }
 
-  const input = args.join(" ");
+  const input = args.join(' ');
   const result = parseInput(input);
 
   if (result.help) {
