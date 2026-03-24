@@ -8,6 +8,7 @@ const {
   squareRoot,
 } = require('../src/calculator');
 
+// Note: These tests focus on the core calculator functions. Input parsing and validation are tested separately.
 describe('Calculator - Basic Operations', () => {
   describe('add', () => {
     test('should add two positive numbers', () => {
