@@ -1,5 +1,5 @@
-const calculator = require("./calculator");
-const inputHandler = require("./inputHandler");
+const calculator = require('./calculator');
+const inputHandler = require('./inputHandler');
 
 // If run directly from command line
 if (require.main === module) {

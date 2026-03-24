@@ -17,8 +17,8 @@ const CONSTRAINTS = {
  * @returns {object} Validation result
  */
 const validateInputFormat = (input) => {
-  if (!input || typeof input !== "string") {
-    return { valid: false, error: "Input must be a non-empty string" };
+  if (!input || typeof input !== 'string') {
+    return { valid: false, error: 'Input must be a non-empty string' };
   }
 
   if (input.length > CONSTRAINTS.MAX_INPUT_LENGTH) {
@@ -37,8 +37,8 @@ const validateInputFormat = (input) => {
  * @param {string} context - Description of the number (e.g., "operand 1")
  * @returns {object} Validation result
  */
-const validateNumber = (num, context = "number") => {
-  if (typeof num !== "number" || isNaN(num)) {
+const validateNumber = (num, context = 'number') => {
+  if (typeof num !== 'number' || isNaN(num)) {
     return { valid: false, error: `${context} must be a valid number` };
   }
 
@@ -73,19 +73,19 @@ const validateNumber = (num, context = "number") => {
  */
 const validateOperation = (operation) => {
   const validOps = [
-    "add",
-    "+",
-    "subtract",
-    "-",
-    "multiply",
-    "*",
-    "divide",
-    "/",
-    "power",
-    "^",
-    "square",
-    "sqrt",
-    "squareroot",
+    'add',
+    '+',
+    'subtract',
+    '-',
+    'multiply',
+    '*',
+    'divide',
+    '/',
+    'power',
+    '^',
+    'square',
+    'sqrt',
+    'squareroot',
   ];
 
   if (!validOps.includes(operation.toLowerCase())) {
@@ -105,18 +105,18 @@ const validateOperation = (operation) => {
  * @returns {object} Validation result
  */
 const validateOperandCount = (operation, operandCount) => {
-  const unaryOps = ["square", "sqrt", "squareroot"];
+  const unaryOps = ['square', 'sqrt', 'squareroot'];
   const binaryOps = [
-    "add",
-    "+",
-    "subtract",
-    "-",
-    "multiply",
-    "*",
-    "divide",
-    "/",
-    "power",
-    "^",
+    'add',
+    '+',
+    'subtract',
+    '-',
+    'multiply',
+    '*',
+    'divide',
+    '/',
+    'power',
+    '^',
   ];
 
   if (unaryOps.includes(operation.toLowerCase()) && operandCount !== 1) {
@@ -154,18 +154,18 @@ const validateOperands = (operation, operands) => {
   }
 
   // Operation-specific validation
-  if (["divide", "/"].includes(op) && operands[1] === 0) {
-    return { valid: false, error: "Division by zero is not allowed" };
+  if (['divide', '/'].includes(op) && operands[1] === 0) {
+    return { valid: false, error: 'Division by zero is not allowed' };
   }
 
-  if (["sqrt", "squareroot"].includes(op) && operands[0] < 0) {
+  if (['sqrt', 'squareroot'].includes(op) && operands[0] < 0) {
     return {
       valid: false,
-      error: "Square root of negative numbers is not allowed",
+      error: 'Square root of negative numbers is not allowed',
     };
   }
 
-  if (["^", "power"].includes(op)) {
+  if (['^', 'power'].includes(op)) {
     if (
       operands[1] < CONSTRAINTS.MIN_EXPONENT ||
       operands[1] > CONSTRAINTS.MAX_EXPONENT
@@ -189,11 +189,11 @@ const validateResult = (result) => {
   if (!isFinite(result)) {
     return {
       valid: false,
-      error: "Calculation resulted in an invalid number (Infinity or NaN)",
+      error: 'Calculation resulted in an invalid number (Infinity or NaN)',
     };
   }
 
-  const numValidation = validateNumber(result, "Result");
+  const numValidation = validateNumber(result, 'Result');
   return numValidation;
 };
 
