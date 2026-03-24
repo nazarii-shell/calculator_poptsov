@@ -7,5 +7,5 @@ if (require.main === module) {
   inputHandler.handleCLIArgs(args);
 }
 
-// Exporting calculator for use in other modules (e.g., tests)
+// export for testing and potential future use in other contexts
 module.exports = calculator;
