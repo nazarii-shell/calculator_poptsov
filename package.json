@@ -8,11 +8,17 @@
   },
   "scripts": {
     "start": "node bin/calculator",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "jest --testPathIgnorePatterns='smoke'",
+    "test:all": "jest",
+    "test:watch": "jest --watch --testPathIgnorePatterns='smoke'",
+    "test:coverage": "jest --coverage --testPathIgnorePatterns='smoke'",
+    "test:smoke": "jest --testPathPattern=smoke",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "build": "node scripts/build.js",
+    "deploy:staging": "node scripts/deploy.js staging",
+    "deploy:production": "node scripts/deploy.js production",
+    "verify": "jest tests/smoke.test.js"
   },
   "keywords": [
     "calculator",
