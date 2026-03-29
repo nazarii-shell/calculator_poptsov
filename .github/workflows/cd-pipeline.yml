@@ -55,7 +55,7 @@ jobs:
         run: node scripts/build.js
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifact
           path: dist/build-artifact.txt
@@ -79,7 +79,7 @@ jobs:
           node-version: "18"
 
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: dist
@@ -142,7 +142,7 @@ jobs:
           node-version: "18"
 
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: dist
