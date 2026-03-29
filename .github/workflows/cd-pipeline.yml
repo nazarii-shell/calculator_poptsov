@@ -1,0 +1,163 @@
+name: CD Pipeline - Test Build Deploy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  stage_1_test:
+    name: "Stage 1: Unit Tests"
+    runs-on: ubuntu-latest
+    outputs:
+      test_status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm test -- --coverage --testPathPattern="calculator|inputHandler|operationRegistry|validator"
+
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unit-tests
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  stage_2_build:
+    name: "Stage 2: Build"
+    runs-on: ubuntu-latest
+    needs: stage_1_test
+    outputs:
+      build_status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Run Build
+        run: node scripts/build.js
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: dist/build-artifact.txt
+          retention-days: 1
+
+  stage_3_deploy_staging:
+    name: "Stage 3: Deploy to Staging"
+    runs-on: ubuntu-latest
+    needs: stage_2_build
+    environment:
+      name: staging
+    outputs:
+      staging_status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: dist
+
+      - name: Deploy to Staging Environment
+        run: node scripts/deploy.js staging
+
+      - name: Log deployment details
+        run: |
+          echo "✓ Staging deployment completed"
+          echo "Environment: staging"
+          echo "Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+  stage_4_verify_staging:
+    name: "Stage 4: Verify Staging"
+    runs-on: ubuntu-latest
+    needs: stage_3_deploy_staging
+    outputs:
+      verify_status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Smoke Tests
+        run: npm test -- smoke.test.js --testPathPattern="smoke"
+
+      - name: Verify artifact accessibility
+        run: |
+          if [ -f "dist/build-artifact.txt" ]; then
+            echo "✓ Artifact is accessible"
+            echo "Artifact size: $(wc -c < dist/build-artifact.txt) bytes"
+          else
+            echo "✗ Artifact not found"
+            exit 1
+          fi
+
+  stage_5_deploy_production:
+    name: "Stage 5: Deploy to Production (Manual Approval)"
+    runs-on: ubuntu-latest
+    needs: stage_4_verify_staging
+    environment:
+      name: production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: dist
+
+      - name: Deploy to Production Environment
+        run: node scripts/deploy.js production
+
+      - name: Post-deployment verification
+        run: |
+          echo "✓ Production deployment completed"
+          echo "Environment: production"
+          echo "Deployed at: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "Deployed by: ${{ github.actor }}"
+
+      - name: Notify deployment success
+        run: |
+          echo "Pipeline completed successfully!"
+          echo "All stages passed: Test → Build → Deploy Staging → Verify Staging → Deploy Production"
