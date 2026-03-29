@@ -1,11 +1,27 @@
 # Pipeline Usage Guide
 
+## Understanding Test Separation
+
+The tests are separated into two categories:
+
+- **Unit Tests** (`npm test`) - Fast tests for code logic
+  - Runs without artifacts
+  - Executes in ~0.4 seconds
+  - 154 tests total
+  - **Use this during development**
+
+- **Smoke Tests** (`npm run test:smoke`) - Post-deployment verification
+  - Requires the build artifact to exist
+  - Only runs AFTER `npm run build`
+  - 6 tests for deployment validation
+  - **Used in pipeline after build stage**
+
 ## Local Testing
 
 Run the complete pipeline locally to test before pushing to GitHub:
 
 ```bash
-# 1. Run unit tests
+# 1. Run unit tests (no artifact needed)
 npm test
 
 # 2. Create build artifact
@@ -14,12 +30,14 @@ npm run build
 # 3. Deploy to staging (locally simulated)
 npm run deploy:staging
 
-# 4. Run smoke tests/verification
+# 4. Run smoke tests/verification (requires artifact from step 2)
 npm run test:smoke
 
 # 5. Deploy to production (locally simulated)
 npm run deploy:production
 ```
+
+**Important:** Smoke tests MUST be run AFTER the build step, since they verify the artifact's existence and contents.
 
 ## GitHub Actions Workflow
 
@@ -29,14 +47,19 @@ The pipeline triggers automatically on push to `main` branch:
 Push to main
     ↓
 Stage 1: Unit Tests (automatic)
+    └─ npm test (excludes smoke tests)
     ↓
 Stage 2: Build (automatic, requires Stage 1 pass)
+    └─ npm run build (creates artifact)
     ↓
 Stage 3: Deploy Staging (automatic, requires Stage 2 pass)
+    └─ npm run deploy:staging
     ↓
 Stage 4: Verify Staging (automatic, requires Stage 3 pass)
+    └─ npm run test:smoke (requires artifact from Stage 2)
     ↓
 Stage 5: Deploy Production (REQUIRES MANUAL APPROVAL)
+    └─ npm run deploy:production
 ```
 
 ## Approving Production Deployment
@@ -113,12 +136,18 @@ npm run build
 ### Smoke Tests Fail
 
 ```bash
-npm run test:smoke -- --verbose
-# Check build artifact exists:
-ls -la dist/build-artifact.txt
-# Verify calculator module imports:
+# This is expected! Smoke tests need the artifact first.
+# Always run in this order:
+npm run build                 # Step 1: Create artifact
+npm run test:smoke           # Step 2: Run smoke tests
+
+# If smoke tests still fail, check:
+ls -la dist/build-artifact.txt    # Verify artifact exists
+npm test                          # Make sure unit tests pass first
 node -e "const calc = require('./src/calculator'); console.log(calc.add(2,3))"
 ```
+
+**Key Point:** Smoke tests REQUIRE the build artifact to exist. They are meant to run AFTER the build stage in the pipeline.
 
 ## Best Practices
 
@@ -137,15 +166,31 @@ npm run
 # or
 cat package.json | grep -A 15 '"scripts"'
 
-# Run tests with coverage
+# Run ALL tests (unit tests + smoke tests together)
+npm run test:all
+
+# Run tests with coverage report
 npm run test:coverage
 
-# Run linting
+# Watch mode - re-runs unit tests on file changes
+npm run test:watch
+
+# Run linting (code style check)
 npm run lint
 
-# Fix linting issues
+# Fix linting issues automatically
 npm run lint:fix
 
-# Start the application
+# Start the calculator application
 npm start
 ```
+
+## Test Commands Summary
+
+| Command | Tests | Artifact Required | Use Case |
+|---------|-------|-------------------|----------|
+| `npm test` | Unit tests only (154) | No | Development, CI unit test stage |
+| `npm run test:all` | All tests (160) | Need to build first | Complete validation |
+| `npm run test:smoke` | Smoke tests only (6) | **Yes** | After build, deployment verification |
+| `npm run test:coverage` | Unit tests + coverage | No | Code coverage analysis |
+| `npm run test:watch` | Unit tests + watch | No | Development with auto-rerun |

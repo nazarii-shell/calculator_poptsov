@@ -5,11 +5,11 @@
  * This simulates the build process by creating a distributable artifact
  */
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const buildDir = path.join(__dirname, "..", "dist");
-const artifactFile = path.join(buildDir, "build-artifact.txt");
+const buildDir = path.join(__dirname, '..', 'dist');
+const artifactFile = path.join(buildDir, 'build-artifact.txt');
 
 try {
   // Create dist directory if it doesn't exist
@@ -46,9 +46,9 @@ STATUS: BUILD SUCCESSFUL
   fs.writeFileSync(artifactFile, artifactContent.trim());
 
   console.log(`✓ Build artifact created: ${artifactFile}`);
-  console.log("Build completed successfully");
+  console.log('Build completed successfully');
   process.exit(0);
 } catch (error) {
-  console.error("Build failed:", error.message);
+  console.error('Build failed:', error.message);
   process.exit(1);
 }
